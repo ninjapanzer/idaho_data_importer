@@ -63,7 +63,8 @@ class Reader
     @data ||= {}
     @files.each do |file|
       puts "Reading #{file.path}"
-      file_processing_mode = identify_reader_method_of(file) if @processing_mode.nil?
+      file_processing_mode = @processing_mode
+      file_processing_mode = identify_reader_method_of(file) if file_processing_mode.nil?
       data = ''
       case file_processing_mode != UNKNOWN_FILE
       when file_processing_mode == TSV_FILE
@@ -77,6 +78,6 @@ class Reader
       end
       @data[file.path] = data
     end
-    IO.write("tsvdata.pnz", @data)
+    IO.write("data.pnz", @data)
   end
 end
