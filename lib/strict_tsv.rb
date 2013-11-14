@@ -1,17 +1,8 @@
 # modified from gist https://gist.github.com/hqmq/5460684
 # The main parse method is mostly borrowed from a tweet by @JEG2
+require_relative 'encoding_support'
 class StrictTSV
-
-  DATA_ENCODING = 'utf-8'
-  KEY_ENCODING = 'ascii'
-
-  def self.normalize_encoding str
-    str.encode(DATA_ENCODING)
-  end
-
-  def self.key_encoding key
-    key.encode(KEY_ENCODING)
-  end
+  include EncodingSupport
 
   def self.parse(file)
     headers = key_encoding(normalize_encoding(file.gets)).strip.split("\t")
