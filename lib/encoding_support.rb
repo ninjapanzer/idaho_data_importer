@@ -9,7 +9,7 @@ module EncodingSupport
     end
 
     def key_encoding key
-      key.encode(KEY_ENCODING)
+      key.encode(KEY_ENCODING, undef: :replace, invalid: :replace, replace: '')
     end
   end
 
