@@ -18,7 +18,7 @@ def get_encoding filename
 }
 end
 
-files = Dir.glob('data/tsv/**').map do |file|
+files = Dir.glob('data/*.*').map do |file|
   encoding_hash = get_encoding(file)
   File.new(File.join(File.expand_path File.dirname(__FILE__), file), mode: encoding_hash[:mode], encoding: encoding_hash[:encoding])
 end
