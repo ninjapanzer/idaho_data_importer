@@ -1,29 +1,31 @@
 # modified from gist https://gist.github.com/hqmq/5460684
 # The main parse method is mostly borrowed from a tweet by @JEG2
 class StrictTSV
-  attr_reader :filepath
-  def initialize(filepath)
-    @filepath = filepath
+
+  DATA_ENCODING = 'utf-8'
+  KEY_ENCODING = 'ascii'
+
+  def self.normalize_encoding str
+    str.encode(DATA_ENCODING)
   end
- 
-  def parse
-    open(filepath) do |f|
-      headers = f.gets.encode('UTF-8','binary', :invalid => :replace, :undef => :replace, :replace => '').strip.split("\t")
-      f.each do |line|
-        fields = Hash[headers.zip(line.split("\t"))]
-        yield fields
-      end
-    end
+
+  def self.key_encoding key
+    key.encode(KEY_ENCODING)
   end
 
   def self.parse(file)
-    headers = file.gets.encode('UTF-8','binary', :invalid => :replace, :undef => :replace, :replace => '').strip.split("\t")
-    fields = []
-    file.each do |line|
-      fields.push (line.encode('UTF-8','binary', :invalid => :replace, :undef => :replace, :replace => '').strip.split("\t"))
+    headers = key_encoding(normalize_encoding(file.gets)).strip.split("\t")
+    table ||= {}
+    headers.each do |h|
+      table[h] = []
     end
-    table = {headers => fields}
-    binding.pry
+    file.each do |line|
+      fields = Hash[headers.zip(normalize_encoding(line).strip.split("\t"))]
+      table.keys.each do |k|
+        table[k].push fields[k]
+      end
+    end
     table
   end
+
 end

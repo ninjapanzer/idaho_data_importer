@@ -6,6 +6,9 @@ class Reader
 
   def initialize(files, expand=false, extension='txt', pattern=/.+\..*/, order=[])
     raise ImporterException::NoFiles, 'Source files undefined' unless files
+
+    files = [files] unless files.is_a? Array
+
     @files = files
     @data ||= {}
 
@@ -13,9 +16,11 @@ class Reader
 
 
   def read_all
-    StrictTSV.parse(@files.first).to_json
+    @data ||= {}
     @files.each do |file|
-      
+      data = StrictTSV.parse(file).to_json
+      @data[file.path] = data
     end
+    IO.write("tsvdata.pnz", @data)
   end
 end
