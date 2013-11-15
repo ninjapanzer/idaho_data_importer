@@ -27,10 +27,10 @@ class Reader
       data = ''
       case file_processing_mode != DataFileIdentifier::UNKNOWN_FILE
       when file_processing_mode == DataFileIdentifier::TSV_FILE
-        data = StrictTSV.parse(file).to_json
+        data = StrictTSV.parse(file)
         puts data
       when file_processing_mode == DataFileIdentifier::CSV_FILE
-        data = StrictCSV.parse(file).to_json
+        data = StrictCSV.parse(file)
         puts data
       else
         next
@@ -38,5 +38,6 @@ class Reader
       @data[file.path] = data
     end
     IO.write("data.pnz", @data)
+    self
   end
 end

@@ -15,10 +15,10 @@ files = Dir.glob('data/*.*').map do |file|
   FileEncodingSupport.new(file).file_with_encoding
 end
 
-reader = Reader.new files
-reader.read_all
-joiner = reader.files
+reader = Reader.new(files).read_all
+data = reader.data
 
+joiner = Joiner.new([:student_code, :staff_code, :course_code], data)
 at_exit{
   files.map{|f| f.close}
   redis.shutdown
