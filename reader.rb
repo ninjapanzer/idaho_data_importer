@@ -1,4 +1,5 @@
 require_relative 'lib/strict_tsv'
+require_relative 'lib/strict_csv'
 require_relative 'lib/encoding_support'
 require_relative 'lib/data_file_identifier'
 require 'json'
@@ -29,7 +30,7 @@ class Reader
         data = StrictTSV.parse(file).to_json
         puts data
       when file_processing_mode == DataFileIdentifier::CSV_FILE
-        #data = CSVSTUB.parse
+        data = StrictCSV.parse(file).to_json
         puts 'csv data would be here'
       else
         next
