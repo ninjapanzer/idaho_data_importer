@@ -17,7 +17,6 @@ module EncodingSupport
     extend ClassMethods
   end
 
-
   def self.included(base)
     base.extend ClassMethods
   end
