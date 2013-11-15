@@ -1,5 +1,5 @@
 class FileEncodingSupport
-  def initialize(file, mode=r)
+  def initialize(file, mode='r')
     @file = file.is_a?(File) ? file.path : file
     @encoding = get_file_encoding
     @mode = @encoding.ascii_compatible? ? mode : "#{mode}b"
