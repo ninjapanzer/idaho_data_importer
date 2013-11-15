@@ -31,7 +31,7 @@ class Reader
         puts data
       when file_processing_mode == DataFileIdentifier::CSV_FILE
         data = StrictCSV.parse(file).to_json
-        puts 'csv data would be here'
+        puts data
       else
         next
       end
