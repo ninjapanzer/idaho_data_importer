@@ -20,5 +20,6 @@ reader.read_all
 joiner = reader.files
 
 at_exit{
+  files.map{|f| f.close}
   redis.shutdown
 }
