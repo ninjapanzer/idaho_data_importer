@@ -11,7 +11,14 @@ class StrictCSV
                            :converters  => :all,
                            :encoding    => FileEncodingSupport.new(file).encoding_string
                           )
-    binding.pry
+    table ||= {}
+    headers = data.headers.flatten
+    
+    data.by_col!
+    data.group_by.each do |col|
+      table[col.first] = col.last
+    end
+    table
   end
 
 end
