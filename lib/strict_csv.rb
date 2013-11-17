@@ -1,5 +1,6 @@
 require_relative 'encoding_support'
 require_relative 'file_encoding_support'
+require_relative 'data_table'
 require "csv"
 
 class StrictCSV
@@ -11,12 +12,10 @@ class StrictCSV
                            :converters  => :all,
                            :encoding    => FileEncodingSupport.new(file).encoding_string
                           )
-    table ||= {}
-    headers = data.headers.flatten
-    
-    data.by_col!
-    data.group_by.each do |col|
-      table[col.first] = col.last
+    table ||= DataTable.new (data.headers)
+
+    data.each do |row|
+      table.add_row row.to_hash
     end
     table
   end

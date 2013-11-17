@@ -10,16 +10,13 @@ class StrictTSV
   def self.parse(file)
     file = file.is_a?(File) ? file : FileEncodingSupport.new(file).file_with_encoding
     headers = key_encoding(normalize_encoding(file.gets)).strip.split("\t")
-    table ||= {}
-    headers.each do |h|
-      table[h] = []
-    end
+    
+    table ||= DataTable.new(headers)
+
     file.each do |line|
-      fields = Hash[headers.zip(normalize_encoding(line).strip.split("\t"))]
-      table.keys.each do |k|
-        table[k].push convert_numeric(fields[k])
-      end
+      table.add_row Hash[headers.zip(normalize_encoding(line).strip.split("\t"))]
     end
+    binding.pry
     table
   end
 
