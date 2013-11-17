@@ -1,5 +1,5 @@
 require 'rubygems'
-require_relative 'exceptions'
+require_relative 'lib/exceptions'
 require_relative 'joiner'
 require_relative 'reader'
 require_relative 'lib/file_encoding_support'
