@@ -16,7 +16,6 @@ class StrictTSV
     file.each do |line|
       table.add_row Hash[headers.zip(normalize_encoding(line).strip.split("\t"))]
     end
-    binding.pry
     table
   end
 
