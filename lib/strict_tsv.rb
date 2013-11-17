@@ -14,7 +14,7 @@ class StrictTSV
     table ||= DataTable.new(headers)
 
     file.each do |line|
-      table.add_row Hash[headers.zip(normalize_encoding(line).strip.split("\t"))]
+      table.add_row Hash[headers.zip(normalize_encoding(line).strip.split("\t").map{ |s| convert_numeric(s) })]
     end
     table
   end
