@@ -7,8 +7,6 @@ class DataTable
     attr_accessor :configuration
   end
 
-  attr_reader :rows, :headers
-
   def self.config
     self.configuration ||= Configuration.new
     yield(configuration)
@@ -20,10 +18,12 @@ class DataTable
     @config = DataTable.configuration
     setup_redis if @config.redis
     add_headers headers unless headers.empty?
-    add_rows rows unless rows.empty?
+    add_rows row unless rows.empty?
   end
 
+  #DONT USE
   def add_rows (rows)
+    raise Exception, "Don't Use Me"
     detect_array_exception_for! rows
     @rows = rows
   end
@@ -31,14 +31,36 @@ class DataTable
   def add_row (row=[])
     detect_headers_not_set_and_raise!
     raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless @headers.count == row.count
-    @rows.push row
-    @redis["#{@redis_id_hash}:rows"] = @rows
+    @rows.push row unless @redis
+    if @redis
+      index = @redis.incr "#{@redis_id_hash}:rows:count"
+      row.each do |r|
+        @redis.hset "#{@redis_id_hash}:rows:#{index}", r.first, r.last
+      end
+    end
+      
   end
 
   def add_headers (headers)
     detect_array_exception_for! headers
-    @headers = headers
-    @redis["#{@redis_id_hash}:headers"] = @headers
+    @headers = headers unless @redis
+    headers.each {|h| @redis.rpush "#{@redis_id_hash}:headers", h } if @redis
+  end
+
+  def rows (start=1,stop=-1)
+    return @rows unless @redis
+    stop = (@redis.get "#{@redis_id_hash}:rows:count").to_i if stop == -1
+    l_headers = headers
+    (start..stop).each do |index|
+      thing = @redis.hgetall "#{@redis_id_hash}:rows:#{index}"
+      binding.pry
+    end
+
+  end
+
+  def headers
+    return @headers unless @redis
+    @redis.lrange "#{@redis_id_hash}:headers", 0, -1
   end
 
   def by_rows
