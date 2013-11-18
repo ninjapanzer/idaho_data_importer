@@ -12,6 +12,7 @@ sleep 2  #wait for redis to start
 DataTable.config do |c|
   c.redis = true
   c.redis_port = 6381
+  c.flushall
 end
 
 redis = Redis.new(:port => 6381) #get on that redis

@@ -17,8 +17,10 @@ class DataTable
   def initialize (headers=[], rows=[])
     @headers = headers
     @rows = rows
-    add_headers = headers unless headers.empty?
-    add_rows = rows unless rows.empty?
+    @config = DataTable.configuration
+    setup_redis if @config.redis
+    add_headers headers unless headers.empty?
+    add_rows rows unless rows.empty?
   end
 
   def add_rows (rows)
@@ -30,11 +32,13 @@ class DataTable
     detect_headers_not_set_and_raise!
     raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless @headers.count == row.count
     @rows.push row
+    @redis["#{@redis_id_hash}:rows"] = @rows
   end
 
   def add_headers (headers)
     detect_array_exception_for! headers
     @headers = headers
+    @redis["#{@redis_id_hash}:headers"] = @headers
   end
 
   def by_rows
@@ -62,6 +66,11 @@ private
     Hash[@headers.zip]
   end
 
+  def setup_redis
+    @redis = Redis.new(:port => @config.redis_port)
+    @redis_id_hash = SecureRandom.uuid
+  end
+
   def detect_headers_not_set_and_raise!
     raise DataTableException::HeadersNotSet, "You must set headers before you can add a row" if @headers.empty?
   end
@@ -77,6 +86,12 @@ class Configuration
 
   def initialize
     @redis = false
-    @redis_port = 6080
+    @redis_port = 6379
+  end
+
+  def flushall
+    redis = Redis.new(:port => @redis_port)
+    redis.flushall
+    redis = nil
   end
 end
