@@ -38,6 +38,7 @@ private
           insertions[r[strat.first]].merge! r
           headers.merge insertions[r[strat.first]].keys
         end
+        @data[file].expire!
       end
 
       data_t = DataTable.new headers.to_a

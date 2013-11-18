@@ -79,10 +79,6 @@ class DataTable
     rows
   end
 
-  def table_id
-    @redis_id_hash
-  end
-
   def by_cols
     detect_headers_not_set_and_raise!
     cols = []
@@ -90,6 +86,18 @@ class DataTable
       cols.push @rows.map { |row| row[h] }
     end
     cols
+  end
+
+  def table_id
+    @redis_id_hash
+  end
+
+  def expire! sec=120
+    keys = ["#{@redis_id_hash}:headers", "#{@redis_id_hash}:count"]
+    start = 0
+    stop = (@redis.get "#{@redis_id_hash}:rows:count").to_i
+    (start...stop).map{|index| @redis.expire "#{@redis_id_hash}:rows:#{index}", sec}
+    keys.map{ |k| @redis.expire k, sec }
   end
 
 private
