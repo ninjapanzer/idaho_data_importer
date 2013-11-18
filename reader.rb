@@ -7,9 +7,11 @@ require 'json'
 class Reader
   attr_reader :files, :data
 
-  def initialize(files, expand=false, mode=nil, pattern=/.+\..*/)
+  def initialize(files, options={})
     raise ImporterException::NoFiles, 'Source files undefined' unless files
-    @processing_mode = mode
+    @processing_mode = options[:mode]
+    @expand = options[:expand] ||= false
+    @pattern = options[:pattern] ||= /.+\..*/
     files = [files] unless files.is_a? Array
 
     @files = files

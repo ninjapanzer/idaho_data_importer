@@ -1,7 +1,18 @@
 require_relative 'exceptions'
+require 'redis'
+require 'securerandom'
 
 class DataTable
+  class << self
+    attr_accessor :configuration
+  end
+
   attr_reader :rows, :headers
+
+  def self.config
+    self.configuration ||= Configuration.new
+    yield(configuration)
+  end
 
   def initialize (headers=[], rows=[])
     @headers = headers
@@ -51,10 +62,6 @@ private
     Hash[@headers.zip]
   end
 
-  catch DataTableException::InvalidRow do
-    
-  end
-
   def detect_headers_not_set_and_raise!
     raise DataTableException::HeadersNotSet, "You must set headers before you can add a row" if @headers.empty?
   end
@@ -63,4 +70,13 @@ private
     raise DataTableException::NotAnArray, "#{var} is not an array" unless var.is_a? Array
   end
   
+end
+
+class Configuration
+  attr_accessor :redis_port, :redis
+
+  def initialize
+    @redis = false
+    @redis_port = 6080
+  end
 end

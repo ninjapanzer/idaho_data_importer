@@ -9,6 +9,11 @@ require 'pry'
 spawn 'redis-server', 'redis.conf' #spin up some redis on 6381
 sleep 2  #wait for redis to start
 
+DataTable.config do |c|
+  c.redis = true
+  c.redis_port = 6381
+end
+
 redis = Redis.new(:port => 6381) #get on that redis
 
 files = Dir.glob('data/*.*').map do |file|
