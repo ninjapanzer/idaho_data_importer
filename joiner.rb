@@ -3,6 +3,7 @@ require_relative 'lib/exceptions'
 require 'set'
 
 class Joiner
+  attr_reader :join_strategies, :done_strategies
 
   def initialize(join_keys, data)
     throw ImportExcetion::NoPKeys, 'Primary Keys undefined' unless join_keys

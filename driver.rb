@@ -25,6 +25,10 @@ reader = Reader.new(files).read_all
 data = reader.data
 
 joiner = Joiner.new([:student_code, :staff_code, :course_code], data)
+done = joiner.done_strategies
+
+done.map{ |d| puts d.last.table_id}
+
 at_exit{
   files.map{|f| f.close}
   redis.shutdown

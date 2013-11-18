@@ -1,8 +1,11 @@
 require_relative 'exceptions'
+require_relative 'conversion_support'
 require 'redis'
 require 'securerandom'
 
 class DataTable
+  attr_reader :redis_id_hash
+
   class << self
     attr_accessor :configuration
   end
@@ -16,6 +19,7 @@ class DataTable
     @headers = headers
     @rows = rows
     @config = DataTable.configuration
+    @row_count = 0
     setup_redis if @config.redis
     add_headers headers unless headers.empty?
     add_rows row unless rows.empty?
@@ -33,10 +37,11 @@ class DataTable
     raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless @headers.count == row.count
     @rows.push row unless @redis
     if @redis
-      index = @redis.incr "#{@redis_id_hash}:rows:count"
+      index = @row_count
       row.each do |r|
         @redis.hset "#{@redis_id_hash}:rows:#{index}", r.first, r.last
       end
+      @row_count = @redis.incr "#{@redis_id_hash}:rows:count"
     end
       
   end
@@ -47,15 +52,17 @@ class DataTable
     headers.each {|h| @redis.rpush "#{@redis_id_hash}:headers", h } if @redis
   end
 
-  def rows (start=1,stop=-1)
+  def rows (start=0,stop=-1)
     return @rows unless @redis
     stop = (@redis.get "#{@redis_id_hash}:rows:count").to_i if stop == -1
     l_headers = headers
-    (start..stop).each do |index|
-      thing = @redis.hgetall "#{@redis_id_hash}:rows:#{index}"
-      binding.pry
+    l_rows = []
+    (start...stop).each do |index|
+      l_row = @redis.hgetall("#{@redis_id_hash}:rows:#{index}")
+      l_row.map { |k,v| l_row[k] = ConversionSupport::Utility.convert_numeric(l_row[k]) }
+      l_rows.push l_row
     end
-
+    l_rows
   end
 
   def headers
@@ -70,6 +77,10 @@ class DataTable
       rows.push @headers.map { |h| row[h] }
     end
     rows
+  end
+
+  def table_id
+    @redis_id_hash
   end
 
   def by_cols
