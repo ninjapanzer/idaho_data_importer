@@ -16,7 +16,7 @@ class DataTable
   end
 
   def add_row (row=[])
-    detect_headers_not_set!
+    detect_headers_not_set_and_raise!
     raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless @headers.count == row.count
     @rows.push row
   end
@@ -27,7 +27,7 @@ class DataTable
   end
 
   def by_rows
-    detect_headers_not_set!
+    detect_headers_not_set_and_raise!
     rows = []
     @rows.each do |row|
       rows.push @headers.map { |h| row[h] }
@@ -36,7 +36,7 @@ class DataTable
   end
 
   def by_cols
-    detect_headers_not_set!
+    detect_headers_not_set_and_raise!
     cols = []
     @headers.each do |h|
       cols.push @rows.map { |row| row[h] }
@@ -46,7 +46,16 @@ class DataTable
 
 private
 
-  def detect_headers_not_set!
+  def create_empty_row
+    detect_headers_not_set_and_raise!
+    Hash[@headers.zip]
+  end
+
+  catch DataTableException::InvalidRow do
+    
+  end
+
+  def detect_headers_not_set_and_raise!
     raise DataTableException::HeadersNotSet, "You must set headers before you can add a row" if @headers.empty?
   end
 
