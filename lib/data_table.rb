@@ -41,8 +41,8 @@ class DataTable
     yield(configuration) if block_given?
   end
 
-  def self.build_with_config config
-    inst = DataTable.new [], [] 
+  def self.build_with_config config, assumed_key_hash=nil
+    inst = DataTable.new [], [], assumed_key_hash
     inst.set_config_with config
     inst
   end
