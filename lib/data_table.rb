@@ -9,8 +9,24 @@ class DataTable
     attr_accessor :configuration
   end
 
+  class Configuration
+    attr_accessor :redis_port, :redis
+
+    def initialize
+      @redis = false
+      @redis_port = 6379
+    end
+
+    # you should likely never use this because it will purge the whole redis cache
+    def flushall
+      redis = Redis.new(:port => @redis_port)
+      redis.flushall
+      redis = nil
+    end
+  end
+
   def self.config
-    self.configuration ||= Configuration.new
+    self.configuration ||= DataTable::Configuration.new
     yield(configuration) if block_given?
   end
 
@@ -30,7 +46,7 @@ class DataTable
   end
 
   def set_config_with config
-    config ||= Configuration.new
+    config ||= DataTable::Configuration.new
     @config = config
     setup_redis if @config.redis
   end
@@ -129,22 +145,6 @@ private
     raise DataTableException::NotAnArray, "#{var} is not an array" unless var.is_a? Array
   end
   
-end
-
-class Configuration
-  attr_accessor :redis_port, :redis
-
-  def initialize
-    @redis = false
-    @redis_port = 6379
-  end
-
-  # you should likely never use this because it will purge the whole redis cache
-  def flushall
-    redis = Redis.new(:port => @redis_port)
-    redis.flushall
-    redis = nil
-  end
 end
 
 module DataTableException
