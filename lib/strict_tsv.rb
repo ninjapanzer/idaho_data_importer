@@ -2,10 +2,10 @@
 # The main parse method is mostly borrowed from a tweet by @JEG2
 require_relative 'encoding_support'
 require_relative 'file_encoding_support'
-require_relative 'conversion_support'
+require_relative 'type_conversion_support'
 class StrictTSV
   include EncodingSupport
-  include ConversionSupport
+  include TypeConversionSupport
 
   def self.parse(file)
     file = file.is_a?(File) ? file : FileEncodingSupport.new(file).file_with_encoding

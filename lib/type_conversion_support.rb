@@ -1,4 +1,4 @@
-module ConversionSupport
+module TypeConversionSupport
 
   module ClassMethods
     def numeric? thing

@@ -1,5 +1,4 @@
-require_relative 'exceptions'
-require_relative 'conversion_support'
+require_relative 'type_conversion_support'
 require 'redis'
 require 'securerandom'
 
@@ -12,17 +11,28 @@ class DataTable
 
   def self.config
     self.configuration ||= Configuration.new
-    yield(configuration)
+    yield(configuration) if block_given?
+  end
+
+  def self.build_with_config config
+    inst = DataTable.new [], [] 
+    inst.set_config_with config
+    inst
   end
 
   def initialize (headers=[], rows=[])
     @headers = headers
     @rows = rows
-    @config = DataTable.configuration
     @row_count = 0
-    setup_redis if @config.redis
+    set_config_with DataTable.configuration
     add_headers headers unless headers.empty?
     add_rows row unless rows.empty?
+  end
+
+  def set_config_with config
+    config ||= Configuration.new
+    @config = config
+    setup_redis if @config.redis
   end
 
   #DONT USE
@@ -59,7 +69,7 @@ class DataTable
     l_rows = []
     (start...stop).each do |index|
       l_row = @redis.hgetall("#{@redis_id_hash}:rows:#{index}")
-      l_row.map { |k,v| l_row[k] = ConversionSupport::Utility.convert_numeric(l_row[k]) }
+      l_row.map { |k,v| l_row[k] = TypeConversionSupport::Utility.convert_numeric(l_row[k]) }
       l_rows.push l_row
     end
     l_rows
@@ -134,5 +144,16 @@ class Configuration
     redis = Redis.new(:port => @redis_port)
     redis.flushall
     redis = nil
+  end
+end
+
+module DataTableException
+  class NotAnArray < Exception
+  end
+
+  class HeadersNotSet < Exception
+  end
+
+  class InvalidRow < Exception
   end
 end
