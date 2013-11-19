@@ -4,7 +4,7 @@ require 'redis'
 require 'securerandom'
 
 class DataTable
-  attr_reader :redis_id_hash
+  attr_reader :redis_id_hash, :row_count
 
   class << self
     attr_accessor :configuration
@@ -130,6 +130,7 @@ class Configuration
     @redis_port = 6379
   end
 
+  # you should likely never use this because it will purge the whole redis cache
   def flushall
     redis = Redis.new(:port => @redis_port)
     redis.flushall
