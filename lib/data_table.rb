@@ -10,11 +10,22 @@ class DataTable
   end
 
   class Configuration
-    attr_accessor :redis_port, :redis
+    attr_accessor :redis_port, :redis, :redis_host, :redis_db, :redis_password
 
     def initialize
       @redis = false
+      @redis_host = 'localhost'
       @redis_port = 6379
+      @redis_db = 0
+      @redis_password = nil
+    end
+
+    def build_from_redis_hash hash
+      @redis = true
+      @redis_host = hash[:host]
+      @redis_port = hash[:port]
+      @redis_db = hash[:db]
+      @redis_password = hash[:password]
     end
 
     # you should likely never use this because it will purge the whole redis cache
@@ -133,7 +144,11 @@ private
   end
 
   def setup_redis
-    @redis = Redis.new(:port => @config.redis_port)
+    @redis = Redis.new(
+      :port => @config.redis_port,
+      :host => @config.redis_host,
+      :db => @config.redis_db,
+      :password => @config.redis_password)
     @redis_id_hash = SecureRandom.uuid
   end
 
