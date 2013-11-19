@@ -12,7 +12,7 @@ sleep 2  #wait for redis to start
 DataTable.config do |c|
   c.redis = true
   c.redis_port = 6381
-  c.flushall
+  #c.flushall
 end
 
 redis = Redis.new(:port => 6381) #get on that redis
@@ -24,7 +24,7 @@ end
 reader = Reader.new(files).read_all
 data = reader.data
 
-joiner = Joiner.new([:student_code, :staff_code, :course_code], data)
+joiner = Joiner.new([:student_code], data)
 done = joiner.done_strategies
 
 done.map{ |d| puts d.last.table_id}

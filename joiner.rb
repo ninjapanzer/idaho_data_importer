@@ -25,6 +25,20 @@ private
     the_magic
   end
 
+  def create_data_table_for insertions, headers
+    data_t = DataTable.new headers.to_a
+    insertions.each do |i|
+      row = i.last
+      begin
+        data_t.add_row row.values
+      rescue DataTableException::InvalidRow => e
+        row = Hash[headers.zip].merge row
+        data_t.add_row row
+      end
+    end
+    data_t
+  end
+
   def join
     done_strategies = {}
     @join_strategies.each do |strat|
@@ -41,16 +55,7 @@ private
         @data[file].expire!
       end
 
-      data_t = DataTable.new headers.to_a
-      insertions.each do |i|
-        row = i.last
-        begin
-          data_t.add_row row.values
-        rescue DataTableException::InvalidRow => e
-          row = Hash[headers.zip].merge row
-          data_t.add_row row
-        end
-      end
+      data_t = create_data_table_for insertions, headers
       done_strategies[strat.first] = data_t
       @data[strat.first] = data_t
     end
