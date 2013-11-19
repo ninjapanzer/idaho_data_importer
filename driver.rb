@@ -12,7 +12,7 @@ sleep 2  #wait for redis to start
 DataTable.config do |c|
   c.redis = true
   c.redis_port = 6381
-  #c.flushall
+  c.flushall
 end
 
 redis = Redis.new(:port => 6381) #get on that redis
@@ -23,13 +23,21 @@ end
 
 reader = Reader.new(files).read_all
 data = reader.data
-
-joiner = Joiner.new([:student_code], data)
+binding.pry
+joiner = Joiner.new([:student_code, :school_code], data)
 done = joiner.done_strategies
+binding.pry
+morejoining = Joiner.new([:student_code], done)
+actuallydone = joiner.done_strategies
+
+actually_to_do = actuallydone.map{ |d| d.last.table_id}
 
 to_do = done.map{ |d| d.last.table_id}
+puts to_do
+puts "Actuall Done #{actuallydone}"
 
 to_do.map{ |t| puts DataTable.new([],[], t).row_count }
+actually_to_do.map{ |t| puts DataTable.new([],[], t).row_count }
 
 at_exit{
   files.map{|f| f.close}

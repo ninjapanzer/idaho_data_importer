@@ -30,7 +30,7 @@ private
     insertions.each do |i|
       row = i.last
       begin
-        data_t.add_row row.values
+        data_t.add_row row
       rescue DataTableException::InvalidRow => e
         row = Hash[headers.zip].merge row
         data_t.add_row row
