@@ -27,7 +27,9 @@ data = reader.data
 joiner = Joiner.new([:student_code], data)
 done = joiner.done_strategies
 
-done.map{ |d| puts d.last.table_id}
+to_do = done.map{ |d| d.last.table_id}
+
+to_do.map{ |t| puts DataTable.new([],[], t).row_count }
 
 at_exit{
   files.map{|f| f.close}
