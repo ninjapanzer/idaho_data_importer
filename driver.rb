@@ -23,10 +23,8 @@ end
 
 reader = Reader.new(files).read_all
 data = reader.data
-binding.pry
 joiner = Joiner.new([:student_code, :school_code], data)
 done = joiner.done_strategies
-binding.pry
 morejoining = Joiner.new([:student_code], done)
 actuallydone = joiner.done_strategies
 
