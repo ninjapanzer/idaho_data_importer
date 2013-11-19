@@ -47,13 +47,18 @@ class DataTable
     inst
   end
 
-  def initialize (headers=[], rows=[])
+  def initialize (headers=[], rows=[], assumed_key_hash=nil)
     @headers = headers
     @rows = rows
     @row_count = 0
+    @redis_id_hash = assumed_key_hash
     set_config_with DataTable.configuration
     add_headers headers unless headers.empty?
     add_rows row unless rows.empty?
+  end
+
+  def refresh
+    @row_count = @redis.get "#{@redis_id_hash}:rows:count"
   end
 
   def set_config_with config
@@ -149,7 +154,8 @@ private
       :host => @config.redis_host,
       :db => @config.redis_db,
       :password => @config.redis_password)
-    @redis_id_hash = SecureRandom.uuid
+    refresh if @redis_id_hash
+    @redis_id_hash = SecureRandom.uuid unless @redis_id_hash
   end
 
   def detect_headers_not_set_and_raise!
