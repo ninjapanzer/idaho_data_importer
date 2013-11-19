@@ -71,21 +71,12 @@ class DataTable
   end
 
   def by_rows
-    detect_headers_not_set_and_raise!
-    rows = []
-    @rows.each do |row|
-      rows.push @headers.map { |h| row[h] }
-    end
-    rows
+    by_data headers, rows
+    
   end
 
   def by_cols
-    detect_headers_not_set_and_raise!
-    cols = []
-    @headers.each do |h|
-      cols.push @rows.map { |row| row[h] }
-    end
-    cols
+    by_data rows, headers
   end
 
   def table_id
@@ -101,6 +92,14 @@ class DataTable
   end
 
 private
+
+  def by_data c, r
+    rs = []
+    r.each do |row|
+      rs.push c.map { |h| r[h] }
+    end
+    rows
+  end
 
   def create_empty_row
     detect_headers_not_set_and_raise!
