@@ -24,9 +24,9 @@ end
 
 reader = Reader.new(files).read_all
 data = reader.data
-joiner = Joiner.new([:school_code, :staff_code, :student_code], data)
+joiner = Joiner.build_with_data([:school_code, :staff_code, :student_code], data)
 done = joiner.done_strategies
-morejoining = Joiner.new([:student_code], done)
+morejoining = Joiner.build_with_data([:student_code], done)
 actuallydone = morejoining.done_strategies
 
 actually_to_do = actuallydone.map{ |d| d.last.table_id}

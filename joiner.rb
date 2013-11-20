@@ -5,13 +5,25 @@ require 'set'
 class Joiner
   attr_reader :join_strategies, :done_strategies
 
-  def initialize(join_keys, data)
+  def initialize
+
+  end
+
+  def run join_keys, data
     throw ImportExcetion::NoPKeys, 'Primary Keys undefined' unless join_keys
     @join_keys = join_keys
     @data = data 
     @join_strategies = organize_files_to_join
     @done_strategies = join
   end
+
+  def self.build_with_data(join_keys, data)
+    joiner = Joiner.new
+    joiner.run(join_keys, data)
+    joiner
+  end
+
+
 
 private
 
