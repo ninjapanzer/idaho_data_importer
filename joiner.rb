@@ -46,12 +46,22 @@ private
       headers = Set.new
       strat.last.each do |file|
         l_data = @data[file]
-        rows = l_data.rows.sort_by{|r| r[strat.first]}
+        begin
+          rows = l_data.rows.sort_by{|r| r[strat.first]}
+        rescue ArgumentError => e
+          binding.pry
+          if  (e.message.downcase.index('fixnum')|| 0) > (e.message.downcase.index('string') || 0)
+            rows = l_data.rows.sort_by{|r| r[strat.first].to_i}
+          else
+            rows = l_data.rows.sort_by{|r| r[strat.first].to_s}
+          end
+        end
         rows.each do |r|
           insertions[r[strat.first]] ||= {}
           insertions[r[strat.first]].merge! r
           headers.merge insertions[r[strat.first]].keys
         end
+        puts @data[file]
         @data[file].expire!
       end
 
