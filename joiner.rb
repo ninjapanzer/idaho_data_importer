@@ -40,13 +40,16 @@ private
   end
 
   def sort_data data, sort_key
+    l_data = data
+    rows = nil
     begin
-      rows = l_data.rows.sort_by{|r| r[strat.first]}
+      rows = l_data.rows.sort_by{|r| r[sort_key]}
     rescue ArgumentError => e
-      if  (e.message.downcase.index('fixnum')|| 0) > (e.message.downcase.index('string') || 0)
-        rows = l_data.rows.sort_by{|r| r[strat.first].to_i}
+      mes = e.message.downcase
+      if  (mes.index('fixnum') || 0) > (mes.index('string') || 0)
+        rows = l_data.rows.sort_by{|r| r[sort_key].to_i}
       else
-        rows = l_data.rows.sort_by{|r| r[strat.first].to_s}
+        rows = l_data.rows.sort_by{|r| r[sort_key].to_s}
       end
     end
     rows
@@ -60,7 +63,7 @@ private
       strat.last.each do |file|
         l_data = @data[file]
         
-        rows = sort_data l_data.rows, r[strat.first]
+        rows = sort_data l_data, strat.first
 
         rows.each do |r|
           insertions[r[strat.first]] ||= {}
