@@ -24,7 +24,7 @@ end
 
 reader = Reader.new(files).read_all
 data = reader.data
-joiner = Joiner.new([:staff_code, :school_code, :student_code ], data)
+joiner = Joiner.new([:school_code, :staff_code, :student_code], data)
 done = joiner.done_strategies
 morejoining = Joiner.new([:student_code], done)
 actuallydone = morejoining.done_strategies
@@ -43,7 +43,7 @@ to_do.each do |d|
       csv << r.values
     end
   end
-  IO.write(d+'.csv', csv_string)
+  IO.write('out/'+d+'.csv', csv_string)
 end
 
 to_do.map{ |t| puts DataTable.new([],[], t).row_count }
@@ -57,7 +57,7 @@ actually_to_do.each do |d|
       csv << r.values
     end
   end
-  IO.write(d+'revision.csv', csv_string)
+  IO.write('out/'+d+'revision.csv', csv_string)
 end
 
 
