@@ -39,6 +39,19 @@ private
     data_t
   end
 
+  def sort_data data, sort_key
+    begin
+      rows = l_data.rows.sort_by{|r| r[strat.first]}
+    rescue ArgumentError => e
+      if  (e.message.downcase.index('fixnum')|| 0) > (e.message.downcase.index('string') || 0)
+        rows = l_data.rows.sort_by{|r| r[strat.first].to_i}
+      else
+        rows = l_data.rows.sort_by{|r| r[strat.first].to_s}
+      end
+    end
+    rows
+  end
+
   def join
     done_strategies = {}
     @join_strategies.each do |strat|
@@ -46,16 +59,9 @@ private
       headers = Set.new
       strat.last.each do |file|
         l_data = @data[file]
-        begin
-          rows = l_data.rows.sort_by{|r| r[strat.first]}
-        rescue ArgumentError => e
-          binding.pry
-          if  (e.message.downcase.index('fixnum')|| 0) > (e.message.downcase.index('string') || 0)
-            rows = l_data.rows.sort_by{|r| r[strat.first].to_i}
-          else
-            rows = l_data.rows.sort_by{|r| r[strat.first].to_s}
-          end
-        end
+        
+        rows = sort_data l_data.rows, r[strat.first]
+
         rows.each do |r|
           insertions[r[strat.first]] ||= {}
           insertions[r[strat.first]].merge! r
