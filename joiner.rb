@@ -23,6 +23,11 @@ class Joiner
     joiner
   end
 
+  def sqlite_join
+    require 'sqlite3'
+    db = SQLite3::Database.new ":memory:"
+    db.close if db
+  end
 
 
 private
@@ -92,5 +97,4 @@ private
     end
     done_strategies
   end
-
 end

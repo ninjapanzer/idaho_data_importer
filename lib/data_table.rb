@@ -10,7 +10,7 @@ class DataTable
   end
 
   class Configuration
-    attr_accessor :redis_port, :redis, :redis_host, :redis_db, :redis_password
+    attr_accessor :redis_port, :redis, :redis_host, :redis_db, :redis_password, :axiom_compatible
 
     def initialize
       @redis = false
@@ -18,6 +18,12 @@ class DataTable
       @redis_port = 6379
       @redis_db = 0
       @redis_password = nil
+
+      @axiom_compatible = false
+    end
+
+    def set_axiom_compatible bool=false
+      @axiom_compatible = bool
     end
 
     def build_from_redis_hash hash
@@ -85,7 +91,11 @@ class DataTable
       end
       @row_count = @redis.incr "#{@redis_id_hash}:rows:count"
     end
-      
+  end
+
+  def header_types
+    determine_header_types unless @header_types
+    @header_types
   end
 
   def add_headers (headers)
@@ -121,6 +131,13 @@ class DataTable
     by_data rows, headers
   end
 
+  def ordered_rows
+    rows_arry = []
+    rows.each do |r|
+      rows_arry.push headers.map{|r| r[h]}
+    end
+  end
+
   def table_id
     @redis_id_hash
   end
@@ -134,6 +151,16 @@ class DataTable
   end
 
 private
+
+  def determine_header_types
+    @header_types ||= []
+    l_headers = headers
+    puts headers
+    if row_count > 0
+      first_row = rows.first
+      headers.each {|h| @header_types.push [h.to_sym, first_row[h].class]}
+    end
+  end
 
   def by_data c, r
     rs = []
