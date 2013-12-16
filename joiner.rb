@@ -1,5 +1,6 @@
 require_relative 'lib/data_table'
 require_relative 'lib/exceptions'
+require_relative 'lib/file_naming_support'
 require 'set'
 
 class Joiner
@@ -9,20 +10,28 @@ class Joiner
 
   end
 
-  def run join_keys, data
+  def run
+    @done_strategies = join
+  end
+
+  def setup join_keys, data
     throw ImportExcetion::NoPKeys, 'Primary Keys undefined' unless join_keys
     @join_keys = join_keys
     @data = data 
     @join_strategies = organize_files_to_join
-    @done_strategies = join
   end
 
   def self.build_with_data(join_keys, data)
     joiner = Joiner.new
-    joiner.run(join_keys, data)
+    joiner.setup(join_keys, data)
     joiner
   end
 
+  def run_with_sql connection
+    require 'sequel'
+    @connection = connection
+    @done_strategies = sql_join
+  end
 
 
 private
@@ -40,7 +49,7 @@ private
   def create_data_table_for insertions, headers
     data_t = DataTable.new headers.to_a
     insertions.each do |i|
-      row = i.last
+      row = i
       begin
         data_t.add_row row
       rescue DataTableException::InvalidRow => e
@@ -67,6 +76,26 @@ private
     rows
   end
 
+  def sql_join
+    done_strategies = {}
+    @join_strategies.each do |strat|
+      join_col = strat.first
+      tables = strat.last
+      first_table = @connection[FileNamingSupport::Utility.filename_from(tables.first).to_sym]
+      tables.delete tables.first
+      index ||= 0
+      current_query = first_table
+      tables.each do |t|
+        current_query = current_query.from_self(alias: :the_other_table).join FileNamingSupport::Utility.filename_from(t).to_sym, {join_col.to_sym => join_col.to_sym}
+      end
+      data_t = create_data_table_for current_query.all, current_query.first.keys if current_query.count > 0
+      done_strategies[strat.first] = data_t
+      @data[strat.first] = data_t
+    end
+    binding.pry
+    done_strategies
+  end
+
   def join
     done_strategies = {}
     @join_strategies.each do |strat|
@@ -86,11 +115,10 @@ private
         @data[file].expire!
       end
 
-      data_t = create_data_table_for insertions, headers
+      data_t = create_data_table_for insertions.values, headers
       done_strategies[strat.first] = data_t
       @data[strat.first] = data_t
     end
     done_strategies
   end
-
 end

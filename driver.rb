@@ -2,6 +2,7 @@ require 'rubygems'
 require_relative 'lib/exceptions'
 require_relative 'joiner'
 require_relative 'reader'
+require_relative 'database_loader'
 require_relative 'lib/file_encoding_support'
 require 'redis'
 require 'pry'
@@ -14,6 +15,7 @@ DataTable.config do |c|
   c.redis = true
   c.redis_port = 6381
   c.flushall
+  c.axiom_compatible = true
 end
 
 redis = Redis.new(:port => 6381) #get on that redis
@@ -24,9 +26,23 @@ end
 
 reader = Reader.new(files).read_all
 data = reader.data
+
+db_loader = DatabaseLoader.new data
+
 joiner = Joiner.build_with_data([:school_code, :staff_code, :student_code], data)
+joiner.run_with_sql db_loader.connection
+
+db_loader.connection.disconnect
+
 done = joiner.done_strategies
+
+db_loader = DatabaseLoader.new done
+
 morejoining = Joiner.build_with_data([:student_code], done)
+morejoining.run_with_sql db_loader.connection
+
+db_loader.connection.disconnect
+
 actuallydone = morejoining.done_strategies
 
 actually_to_do = actuallydone.map{ |d| d.last.table_id}
