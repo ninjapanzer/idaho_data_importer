@@ -15,7 +15,6 @@ DataTable.config do |c|
   c.redis = true
   c.redis_port = 6381
   c.flushall
-  c.axiom_compatible = true
 end
 
 redis = Redis.new(:port => 6381) #get on that redis
