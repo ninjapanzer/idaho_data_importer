@@ -27,9 +27,6 @@ end
 reader = Reader.new(files).read_all
 data = reader.data
 
-#DatabaseLoader.config.engine = :postgres
-#DatabaseLoader.config.connection_hash = {:host=>'localhost', :database=>'apangea_development'}
-
 db_loader = DatabaseLoader.new data
 
 joiner = Joiner.build_with_data([:school_code, :staff_code, :student_code], data)
