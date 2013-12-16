@@ -49,7 +49,7 @@ private
   def create_data_table_for insertions, headers
     data_t = DataTable.new headers.to_a
     insertions.each do |i|
-      row = i.last
+      row = i
       begin
         data_t.add_row row
       rescue DataTableException::InvalidRow => e
@@ -77,18 +77,23 @@ private
   end
 
   def sql_join
+    done_strategies = {}
     @join_strategies.each do |strat|
       join_col = strat.first
       tables = strat.last
-      binding.pry
       first_table = @connection[FileNamingSupport::Utility.filename_from(tables.first).to_sym]
       tables.delete tables.first
+      index ||= 0
       current_query = first_table
       tables.each do |t|
-        current_query = current_query.left_outer_join FileNamingSupport::Utility.filename_from(t).to_sym, join_col.to_sym => join_col.to_sym
+        current_query = current_query.from_self(alias: :the_other_table).join FileNamingSupport::Utility.filename_from(t).to_sym, {join_col.to_sym => join_col.to_sym}
       end
-      binding.pry
+      data_t = create_data_table_for current_query.all, current_query.first.keys if current_query.count > 0
+      done_strategies[strat.first] = data_t
+      @data[strat.first] = data_t
     end
+    binding.pry
+    done_strategies
   end
 
   def join
@@ -110,7 +115,7 @@ private
         @data[file].expire!
       end
 
-      data_t = create_data_table_for insertions, headers
+      data_t = create_data_table_for insertions.values, headers
       done_strategies[strat.first] = data_t
       @data[strat.first] = data_t
     end
