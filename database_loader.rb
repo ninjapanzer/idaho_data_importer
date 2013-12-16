@@ -20,17 +20,17 @@ class DatabaseLoader
     ]
 
     def initialize
-      @connection_hash = {
+      @connection_hash ||= {
                            host: 'localhost',
                            port: '',
                            user: '',
                            password: ''
                          }
 
-      @dbengine = :sqlite
+      @dbengine ||= :sqlite
     end
 
-    def dbengine engine = :sqlite
+    def engine= engine = :sqlite
       if ENGINES.include? engine.to_s
         @dbengine = engine.to_sym
       else
@@ -38,7 +38,7 @@ class DatabaseLoader
       end
     end
 
-    def connection_hash config
+    def connection_hash= config
       @connection_hash = config
     end
 
@@ -56,6 +56,7 @@ class DatabaseLoader
   end
 
   def spinup_postgres
+    @connection = Sequel.postgres @config.connection_hash
   end
 
   def spinup_sqlite

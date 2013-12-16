@@ -27,14 +27,25 @@ end
 reader = Reader.new(files).read_all
 data = reader.data
 
-db_loader = DatabaseLoader.new data
+#DatabaseLoader.config.engine = :postgres
+#DatabaseLoader.config.connection_hash = {:host=>'localhost', :database=>'apangea_development'}
 
+db_loader = DatabaseLoader.new data
 
 joiner = Joiner.build_with_data([:school_code, :staff_code, :student_code], data)
 joiner.run_with_sql db_loader.connection
-binding.pry
+
+db_loader.connection.disconnect
+
 done = joiner.done_strategies
+
+db_loader = DatabaseLoader.new done
+
 morejoining = Joiner.build_with_data([:student_code], done)
+morejoining.run_with_sql db_loader.connection
+
+db_loader.connection.disconnect
+
 actuallydone = morejoining.done_strategies
 
 actually_to_do = actuallydone.map{ |d| d.last.table_id}
