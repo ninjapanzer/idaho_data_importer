@@ -2,7 +2,7 @@ require 'rubygems'
 require_relative 'lib/exceptions'
 require_relative 'joiner'
 require_relative 'reader'
-require_relative 'relation_table'
+require_relative 'database_loader'
 require_relative 'lib/file_encoding_support'
 require 'redis'
 require 'pry'
@@ -27,8 +27,11 @@ end
 reader = Reader.new(files).read_all
 data = reader.data
 
-r_table = RelationTable.new data.first.last
+db_loader = DatabaseLoader.new data
+
+
 joiner = Joiner.build_with_data([:school_code, :staff_code, :student_code], data)
+joiner.run_with_sql db_loader.connection
 binding.pry
 done = joiner.done_strategies
 morejoining = Joiner.build_with_data([:student_code], done)

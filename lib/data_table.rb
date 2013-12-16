@@ -4,6 +4,7 @@ require 'securerandom'
 
 class DataTable
   attr_reader :redis_id_hash, :row_count
+  attr_accessor :table_name
 
   class << self
     attr_accessor :configuration
@@ -61,6 +62,10 @@ class DataTable
     set_config_with DataTable.configuration
     add_headers headers unless headers.empty?
     add_rows row unless rows.empty?
+  end
+
+  def table_name
+    @table_name ||= SecureRandom.uuid
   end
 
   def refresh

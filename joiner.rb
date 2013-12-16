@@ -1,5 +1,6 @@
 require_relative 'lib/data_table'
 require_relative 'lib/exceptions'
+require_relative 'lib/file_naming_support'
 require 'set'
 
 class Joiner
@@ -9,24 +10,27 @@ class Joiner
 
   end
 
-  def run join_keys, data
+  def run
+    @done_strategies = join
+  end
+
+  def setup join_keys, data
     throw ImportExcetion::NoPKeys, 'Primary Keys undefined' unless join_keys
     @join_keys = join_keys
     @data = data 
     @join_strategies = organize_files_to_join
-    @done_strategies = join
   end
 
   def self.build_with_data(join_keys, data)
     joiner = Joiner.new
-    joiner.run(join_keys, data)
+    joiner.setup(join_keys, data)
     joiner
   end
 
-  def sqlite_join
-    require 'sqlite3'
-    db = SQLite3::Database.new ":memory:"
-    db.close if db
+  def run_with_sql connection
+    require 'sequel'
+    @connection = connection
+    @done_strategies = sql_join
   end
 
 
@@ -70,6 +74,21 @@ private
       end
     end
     rows
+  end
+
+  def sql_join
+    @join_strategies.each do |strat|
+      join_col = strat.first
+      tables = strat.last
+      binding.pry
+      first_table = @connection[FileNamingSupport::Utility.filename_from(tables.first).to_sym]
+      tables.delete tables.first
+      current_query = first_table
+      tables.each do |t|
+        current_query = current_query.left_outer_join FileNamingSupport::Utility.filename_from(t).to_sym, join_col.to_sym => join_col.to_sym
+      end
+      binding.pry
+    end
   end
 
   def join

@@ -1,7 +1,11 @@
 source 'https://rubygems.org'
 
 gem 'json'
+
 gem 'sqlite3'
-gem 'axiom'
+gem 'pg'
+#gem 'pgsql'
+gem 'sequel'
+
 gem 'redis'
 gem 'pry'
