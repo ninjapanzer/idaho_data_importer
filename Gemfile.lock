@@ -34,5 +34,6 @@ DEPENDENCIES
   redis
   require_all
   rspec
+  rspec-expectations
   sequel
   sqlite3
