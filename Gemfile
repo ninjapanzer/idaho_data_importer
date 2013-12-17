@@ -11,5 +11,6 @@ gem 'pry'
 
 group :test do
   gem 'rspec'
+  gem 'rspec-expectations'
   gem 'require_all'
 end
