@@ -1,6 +1,7 @@
 require 'require_all'
 require_all 'lib'
 require 'rspec/autorun'
+require 'rspec/expectations'
 require 'pry'
 
 RSpec.configure do |config|
