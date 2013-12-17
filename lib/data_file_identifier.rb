@@ -1,3 +1,5 @@
+require_relative 'logging'
+
 class DataFileIdentifier
   attr_reader :format
 
@@ -32,7 +34,7 @@ private
 
   def identify_data_format
 
-    puts "Identifying format of #{@file.path}"
+    LogWriter.log.info "Identifying format of #{@file.path}"
     throw_away_headers = @file.gets
     utf_8_first_line = EncodingSupport::Utility.normalize_encoding(@file.gets).strip
     utf_8_second_line = EncodingSupport::Utility.normalize_encoding(@file.gets).strip
@@ -49,7 +51,7 @@ private
       count_sum = first_row_count + second_row_count
       expected_mode = resolve_mode_for delim if count_sum != 2 && first_row_count == second_row_count
     end
-    puts "expected mode is #{expected_mode}"
+    LogWriter.log.info "expected mode is #{expected_mode}"
     expected_mode
   end
 

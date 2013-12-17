@@ -4,8 +4,12 @@ gem 'json'
 
 gem 'sqlite3'
 gem 'pg'
-#gem 'pgsql'
 gem 'sequel'
-
 gem 'redis'
+
 gem 'pry'
+
+group :test do
+  gem 'rspec'
+  gem 'require_all'
+end
