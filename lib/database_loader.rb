@@ -1,7 +1,7 @@
 require 'pg'
 require 'sequel'
 require 'sqlite3'
-require_relative 'lib/file_naming_support'
+require_relative 'file_naming_support'
 
 class DatabaseLoader
 

@@ -46,6 +46,7 @@ class DataTable
   def self.config
     self.configuration ||= DataTable::Configuration.new
     yield(configuration) if block_given?
+    self.configuration
   end
 
   def self.build_with_config config, assumed_key_hash=nil
@@ -54,14 +55,16 @@ class DataTable
     inst
   end
 
-  def initialize (headers=[], rows=[], assumed_key_hash=nil)
+  def initialize (_headers=[], _rows=[], assumed_key_hash=nil)
     @headers = headers
     @rows = rows
     @row_count = 0
     @redis_id_hash = assumed_key_hash
     set_config_with DataTable.configuration
-    add_headers headers unless headers.empty?
-    add_rows row unless rows.empty?
+    _headers ||= []
+    _rows ||= []
+    add_headers _headers unless _headers.empty?
+    add_rows _rows unless _rows.empty?
   end
 
   def table_name
@@ -69,7 +72,7 @@ class DataTable
   end
 
   def refresh
-    @row_count = @redis.get "#{@redis_id_hash}:rows:count"
+    @row_count = @redis.get("#{@redis_id_hash}:rows:count").to_i
   end
 
   def set_config_with config
@@ -79,16 +82,16 @@ class DataTable
   end
 
   #DONT USE
-  def add_rows (rows)
-    raise Exception, "Don't Use Me"
-    detect_array_exception_for! rows
-    @rows = rows
+  def add_rows (_rows)
+    detect_array_exception_for! _rows
+    _rows.each {|r| add_row r}
   end
 
   def add_row (row=[])
     detect_headers_not_set_and_raise!
-    raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless @headers.count == row.count
+    raise DataTableException::InvalidRow, "Your row doesn't match Your headers row:#{row.count} headers:#{@headers.count}" unless headers.count == row.count
     @rows.push row unless @redis
+    @row_count += 1 unless @redis
     if @redis
       index = @row_count
       row.each do |r|
@@ -103,6 +106,15 @@ class DataTable
     @header_types
   end
 
+  def header_types_hash
+    determine_header_types unless @header_types
+    @header_types_hash = {}
+    @header_types.each do |n,t|
+      @header_types_hash[n] = t
+    end
+    @header_types_hash
+  end
+
   def add_headers (headers)
     detect_array_exception_for! headers
     @headers = headers unless @redis
@@ -110,7 +122,7 @@ class DataTable
   end
 
   def rows (start=0,stop=-1)
-    return @rows unless @redis
+    return @rows ||= [] unless @redis
     stop = (@redis.get "#{@redis_id_hash}:rows:count").to_i if stop == -1
     l_headers = headers
     l_rows = []
@@ -123,7 +135,7 @@ class DataTable
   end
 
   def headers
-    return @headers unless @redis
+    return @headers ||= [] unless @redis
     @redis.lrange "#{@redis_id_hash}:headers", 0, -1
   end
 
@@ -160,7 +172,6 @@ private
   def determine_header_types
     @header_types ||= []
     l_headers = headers
-    puts headers
     if row_count > 0
       first_row = rows.first
       headers.each {|h| @header_types.push [h.to_sym, first_row[h].class]}
@@ -191,7 +202,7 @@ private
   end
 
   def detect_headers_not_set_and_raise!
-    raise DataTableException::HeadersNotSet, "You must set headers before you can add a row" if @headers.empty?
+    raise DataTableException::HeadersNotSet, "You must set headers before you can add a row" if headers.empty?
   end
 
   def detect_array_exception_for! var

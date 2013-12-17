@@ -1,8 +1,8 @@
 require 'rubygems'
 require_relative 'lib/exceptions'
-require_relative 'joiner'
-require_relative 'reader'
-require_relative 'database_loader'
+require_relative 'lib/joiner'
+require_relative 'lib/reader'
+require_relative 'lib/database_loader'
 require_relative 'lib/file_encoding_support'
 require 'redis'
 require 'pry'
@@ -48,7 +48,7 @@ actually_to_do = actuallydone.map{ |d| d.last.table_id}
 
 to_do = done.map{ |d| d.last.table_id}
 puts to_do
-puts "Actuall Done #{actuallydone}"
+puts "Actually Done #{actuallydone}"
 
 to_do.each do |d|
   csv_string = CSV.generate do |csv|

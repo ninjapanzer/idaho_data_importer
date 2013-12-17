@@ -1,6 +1,6 @@
-require_relative 'lib/data_table'
-require_relative 'lib/exceptions'
-require_relative 'lib/file_naming_support'
+require_relative 'data_table'
+require_relative 'exceptions'
+require_relative 'file_naming_support'
 require 'set'
 
 class Joiner
@@ -92,7 +92,6 @@ private
       done_strategies[strat.first] = data_t
       @data[strat.first] = data_t
     end
-    binding.pry
     done_strategies
   end
 
