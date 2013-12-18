@@ -1,4 +1,5 @@
 require_relative 'type_conversion_support'
+require_relative 'logging'
 require 'redis'
 require 'securerandom'
 
@@ -160,6 +161,8 @@ class DataTable
   end
 
   def expire! sec=120
+    return 0 unless @redis
+    LogWriter.log.info "Expiring #{@redis_id_hash} in #{sec} seconds"
     keys = ["#{@redis_id_hash}:headers", "#{@redis_id_hash}:count"]
     start = 0
     stop = (@redis.get "#{@redis_id_hash}:rows:count").to_i

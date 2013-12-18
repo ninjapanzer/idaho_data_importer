@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative 'reader_helper'
+require_relative 'fixtures/reader_helper'
 
 describe Reader do
 
