@@ -29,7 +29,7 @@ describe Joiner do
     end
 
     it "should expire data" do
-      
+
     end
   end
 
