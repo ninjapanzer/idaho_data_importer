@@ -2,11 +2,8 @@ require 'spec_helper'
 
 describe DataTable do
 
-  describe "with Redis" do
+  context "with Redis" do
     before :all do
-      spawn 'redis-server', 'spec/fixtures/redis.conf' #spin up some redis on 6381
-      sleep 2  #wait for redis to start
-      @redis = Redis.new(:port => 6381) #get on that redis
       DataTable.config do |c|
         c.redis = true
         c.redis_port = 6381
@@ -15,7 +12,9 @@ describe DataTable do
     end
 
     after :all do
-      @redis.shutdown
+      DataTable.config do |c|
+        c.redis = false
+      end
     end
 
     let(:valid_table) { DataTable.new(
@@ -35,7 +34,38 @@ describe DataTable do
     let(:headers)   { nil }
     let(:rows)      { nil }
 
-    it "should accept rows" do
+    it "should accept many rows" do
+      old_row_count = valid_table.row_count
+      valid_table.add_rows([{'col_one'=> 'nasty', 'col_tow'=> 'dirty'},{'col_one'=> 'nasty', 'col_tow'=> 'dirty'}])
+      new_row_count = valid_table.row_count
+      old_row_count.should_not == new_row_count
+      (old_row_count+2).should == new_row_count
+    end
+
+    it "should accept a single row" do
+      old_row_count = valid_table.row_count
+      valid_table.add_row({'col_one'=> 'nasty', 'col_tow'=> 'dirty'})
+      new_row_count = valid_table.row_count
+      old_row_count.should_not == new_row_count
+      (old_row_count+1).should == new_row_count
+    end
+
+    it "should return rows" do
+      valid_table.rows.empty?.should_not == true
+    end
+
+    it "should return rows as array of hash" do
+      valid_table.rows.class.should == Array
+      valid_table.rows.first.class.should == Hash
+    end
+
+    it "should return headers" do
+      valid_table.headers.empty?.should_not == true
+    end
+
+    it "should return headers as array of string" do
+      valid_table.headers.class.should == Array
+      valid_table.headers.first.class.should == String
     end
 
     context "headers not supplied" do

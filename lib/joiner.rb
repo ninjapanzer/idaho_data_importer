@@ -1,6 +1,7 @@
 require_relative 'data_table'
 require_relative 'exceptions'
 require_relative 'file_naming_support'
+require_relative 'logging'
 require 'set'
 
 class Joiner
@@ -11,6 +12,7 @@ class Joiner
   end
 
   def run
+    LogWriter.log.debug 'Joining with Handroll'
     @done_strategies = join
   end
 
@@ -24,11 +26,13 @@ class Joiner
   def self.build_with_data(join_keys, data)
     joiner = Joiner.new
     joiner.setup(join_keys, data)
+    LogWriter.log.debug "Creating Joiner"
     joiner
   end
 
   def run_with_sql connection
     require 'sequel'
+    LogWriter.log.debug 'Joining with SQL'
     @connection = connection
     @done_strategies = sql_join
   end
@@ -110,7 +114,6 @@ private
           insertions[r[strat.first]].merge! r
           headers.merge insertions[r[strat.first]].keys
         end
-        puts @data[file]
         @data[file].expire!
       end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe DataTable do
 
-  describe "without Redis" do
+  context "without Redis" do
 
     let(:valid_table) { DataTable.new(
                         ['col_one','col_two'],
@@ -25,7 +25,38 @@ describe DataTable do
       datatable.table_id.nil?.should == true
     end
 
-    it "should accept rows" do
+    it "should accept many rows" do
+      old_row_count = valid_table.row_count
+      valid_table.add_rows([{'col_one'=> 'nasty', 'col_tow'=> 'dirty'},{'col_one'=> 'nasty', 'col_tow'=> 'dirty'}])
+      new_row_count = valid_table.row_count
+      old_row_count.should_not == new_row_count
+      (old_row_count+2).should == new_row_count
+    end
+
+    it "should accept a single row" do
+      old_row_count = valid_table.row_count
+      valid_table.add_row({'col_one'=> 'nasty', 'col_tow'=> 'dirty'})
+      new_row_count = valid_table.row_count
+      old_row_count.should_not == new_row_count
+      (old_row_count+1).should == new_row_count
+    end
+
+    it "should return rows" do
+      valid_table.rows.empty?.should_not == true
+    end
+
+    it "should return rows as array of hash" do
+      valid_table.rows.class.should == Array
+      valid_table.rows.first.class.should == Hash
+    end
+
+    it "should return headers" do
+      valid_table.headers.empty?.should_not == true
+    end
+
+    it "should return headers as array of string" do
+      valid_table.headers.class.should == Array
+      valid_table.headers.first.class.should == String
     end
 
     context "headers not supplied" do

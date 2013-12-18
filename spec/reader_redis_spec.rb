@@ -1,13 +1,10 @@
 require 'spec_helper'
-require_relative 'reader_helper'
+require_relative 'fixtures/reader_helper'
 
 describe Reader do
 
-  describe "with Redis" do
+  context "with Redis" do
     before :all do
-      spawn 'redis-server', 'spec/fixtures/redis.conf' #spin up some redis on 6381
-      sleep 2  #wait for redis to start
-      @redis = Redis.new(:port => 6381) #get on that redis
       DataTable.config do |c|
         c.redis = true
         c.redis_port = 6381
@@ -16,7 +13,9 @@ describe Reader do
     end
 
     after :all do
-      @redis.shutdown
+      DataTable.config do |c|
+        c.redis = false
+      end
     end
 
     it "should use redis" do
