@@ -1,7 +1,7 @@
 require File.expand_path('../lib/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = "arbitrary-data=importer"
+  gem.name          = "arbitrary-data-importer"
   gem.version       = ArbitraryDataImporter::VERSION
   gem.summary       = %q{Collection of tools for working with structured data files}
   gem.description   = gem.summary
