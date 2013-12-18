@@ -3,7 +3,7 @@ require_relative 'fixtures/reader_helper'
 
 describe Reader do
 
-  describe "without redis" do
+  context "without redis" do
 
     before :all do
       spawn 'redis-server', 'spec/fixtures/redis.conf' #spin up some redis on 6381

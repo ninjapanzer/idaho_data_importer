@@ -9,7 +9,7 @@ describe Joiner do
 
   let(:join_data) { student_data }
 
-  context "sqlite3" do
+  context "sqlite3" do #SQL is perfered for proper processing
 
     let(:key_array) {[:student_code]}
 
@@ -29,16 +29,19 @@ describe Joiner do
     end
 
     it "should expire data" do
-
+      
     end
   end
 
-  context "memory" do
+  context "memory" do #memory does not operate the same as SQL
 
     let(:key_array) {[:student_code]}
 
     it "should join data" do
       joined = joiner.run
+      joined.count.should == 1
+      joined['student_code'].headers.count.should == 34
+      joined['student_code'].row_count.should == 37
     end
   end
 end

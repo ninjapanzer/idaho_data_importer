@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe DataTable do
 
-  describe "without Redis" do
+  context "without Redis" do
 
     let(:valid_table) { DataTable.new(
                         ['col_one','col_two'],

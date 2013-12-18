@@ -2,11 +2,8 @@ require 'spec_helper'
 
 describe DataTable do
 
-  describe "with Redis" do
+  context "with Redis" do
     before :all do
-      spawn 'redis-server', 'spec/fixtures/redis.conf' #spin up some redis on 6381
-      sleep 2  #wait for redis to start
-      @redis = Redis.new(:port => 6381) #get on that redis
       DataTable.config do |c|
         c.redis = true
         c.redis_port = 6381
@@ -15,7 +12,9 @@ describe DataTable do
     end
 
     after :all do
-      @redis.shutdown
+      DataTable.config do |c|
+        c.redis = false
+      end
     end
 
     let(:valid_table) { DataTable.new(
