@@ -1,5 +1,5 @@
 require 'require_all'
-require_all 'lib'
+require_all 'lib/arbitrary-data-importer'
 require 'rspec/autorun'
 require 'rspec/expectations'
 require 'pry'

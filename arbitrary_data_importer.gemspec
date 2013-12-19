@@ -1,4 +1,4 @@
-require File.expand_path('../lib/version', __FILE__)
+require File.expand_path('../lib/arbitrary-data-importer/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "arbitrary-data-importer"
@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec-expectations'
   gem.add_development_dependency 'require_all'
 
-  gem.files         = ['README.md'] + Dir['lib/*.rb']
+  gem.files         = ['README.md'] + Dir['lib/**/*.rb']
   gem.test_files    = Dir['spec/**/*.rb']
   gem.require_paths = ["lib"]
 end
