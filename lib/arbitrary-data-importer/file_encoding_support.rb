@@ -13,7 +13,7 @@ module ArbitraryDataImporter
     end
 
     def get_file_encoding
-      Encoding.find(`file -I #{@file}`.match(/(charset)=(\S*)$?/i)[2])
+      Encoding.find(`file --mime #{@file}`.match(/(charset)=(\S*)$?/i)[2])
     end
 
     def encoding_string
