@@ -13,4 +13,5 @@ group :test do
   gem 'rspec'
   gem 'rspec-expectations'
   gem 'require_all'
+  gem 'yarjuf'
 end

@@ -3,6 +3,7 @@ require_all 'lib/arbitrary-data-importer'
 require 'rspec/autorun'
 require 'rspec/expectations'
 require 'pry'
+require 'yarjuf'
 
 RSpec.configure do |config|
   # Use color in STDOUT
