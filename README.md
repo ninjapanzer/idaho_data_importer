@@ -80,3 +80,8 @@ General features should be implemented in this order
     
     
  Some caveats to this are make sure Redis is running before you start and that you have install SQLite3 on your system.
+ 
+#### Test
+
+    bundle
+    rspec
